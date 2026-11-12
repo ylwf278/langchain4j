@@ -17,8 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          ref: 6e90d006fcfabaef245287b8f4748d7f2bf92755
-          fetch-depth: 2
+          ref: 254a5e049faa588a60cc52b7d21b6d5cbc6c8576
+          fetch-depth: 3
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
