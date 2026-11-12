@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           git update-ref refs/remotes/origin/main 6f11264256108a7b1f23110b56e904bbbe93d744
-          ./mvnw -B -ntp -Pspotless -pl langchain4j-http-client -am com.diffplug.spotless:spotless-maven-plugin:2.46.1:check 2>&1 | tee evidence/spotless.log
+          ./mvnw -B -ntp -Pspotless -pl langchain4j-http-client com.diffplug.spotless:spotless-maven-plugin:2.46.1:check 2>&1 | tee evidence/spotless.log
           git diff --exit-code
       - uses: actions/upload-artifact@v4
         if: always()
