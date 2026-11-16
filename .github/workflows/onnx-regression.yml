@@ -1,0 +1,33 @@
+name: ONNX truncation regression
+on:
+  push:
+    branches: [fix/onnx-tokenizer-truncation]
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Confirm failure before fix
+        shell: bash
+        run: |
+          source=embeddings/langchain4j-embeddings/src/main/java/dev/langchain4j/model/embedding/onnx/OnnxBertBiEncoder.java
+          cp "$source" /tmp/fixed-encoder.java
+          git show 886c258b91090d41c941e69ab58edf6aa020a9c9:"$source" > "$source"
+          set +e
+          mvn -B -pl embeddings/langchain4j-embeddings -am -Dtest=OnnxEmbeddingModelIT#should_embed_content_beyond_the_tokenizer_sequence_limit -Dsurefire.failIfNoSpecifiedTests=false -Dspotless.skip=true test > /tmp/before.log 2>&1
+          result=$?
+          set -e
+          cp /tmp/fixed-encoder.java "$source"
+          tail -n 100 /tmp/before.log
+          test "$result" -ne 0
+          grep -Eq 'Tests run: 1, Failures: 1, Errors: 0' /tmp/before.log
+      - name: Verify fix and related cases
+        run: mvn -B -pl embeddings/langchain4j-embeddings -am '-Dtest=OnnxBertBiEncoderTest,OnnxEmbeddingModelIT#should_embed_content_beyond_the_tokenizer_sequence_limit+should_embed+should_embed_510_token_long_text' -Dsurefire.failIfNoSpecifiedTests=false -Dspotless.skip=true test
