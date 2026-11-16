@@ -31,3 +31,5 @@ jobs:
           grep -Eq 'Tests run: 1, Failures: 1, Errors: 0' /tmp/before.log
       - name: Verify fix and related cases
         run: mvn -B -pl embeddings/langchain4j-embeddings -am '-Dtest=OnnxBertBiEncoderTest,OnnxEmbeddingModelIT#should_embed_content_beyond_the_tokenizer_sequence_limit+should_embed+should_embed_510_token_long_text' -Dsurefire.failIfNoSpecifiedTests=false -Dspotless.skip=true test
+      - name: Check formatting
+        run: mvn -B -pl embeddings/langchain4j-embeddings -am -Pspotless spotless:check
